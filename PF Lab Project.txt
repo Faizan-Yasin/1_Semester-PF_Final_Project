@@ -1,0 +1,376 @@
+#include<iostream>
+using namespace std;
+struct Students {
+    string name;
+    int arid;
+    int section;
+    char attendance;
+    int presentCount = 0;
+    int absentCount = 0;
+    int day = 0, month = 0, year = 0;
+};
+void addStudent(Students students[], int& totalStudents, int sections[]);
+void markAttendance(Students students[], int totalStudents);
+void viewAttendance(Students students[], int totalStudents);
+void removeStudent(Students students[], int& totalStudents, int sections[]);
+void updateStudentDetails(Students students[], int totalStudents);
+void updateAttendance(Students students[], int totalStudents);
+void viewStudents(Students students[], int totalStudents);
+void updateSections(Students students[], int totalStudents, int sections[]);
+void updateDate(Students students[], int totalStudents);
+void main() {
+    Students students[500];
+    int sections[10] = { 0 };
+    int totalstudents = 0;
+    int choice;
+    do {
+        cout << "\t\t\t : Student Attendance Management System : \n";
+        cout << "1. Add a Student\n";
+        cout << "2. Mark Attendance\n";
+        cout << "3. View Attendance\n";
+        cout << "4. Remove Student\n";
+        cout << "5. Update Student Details\n";
+        cout << "6. Update Attendance\n";
+        cout << "7. View Students\n";
+        cout << "8. Update Sections\n";
+        cout << "9. Update Date or Year\n";
+        cout << "10. Exit\n";
+        cout << "Enter Your Choice (From 1-10): ";
+        cin >> choice;
+        if (choice == 1)
+            addStudent(students, totalstudents, sections);
+        if (choice == 2)
+            markAttendance(students, totalstudents);
+        if (choice == 3)
+            viewAttendance(students, totalstudents);
+        if (choice == 4)
+            removeStudent(students, totalstudents, sections);
+        if (choice == 5)
+            updateStudentDetails(students, totalstudents);
+        if (choice == 6)
+            updateAttendance(students, totalstudents);
+        if (choice == 7)
+            viewStudents(students, totalstudents);
+        if (choice == 8)
+            updateSections(students, totalstudents, sections);
+        if (choice == 9)
+            updateDate(students, totalstudents);
+        if (choice == 10)
+            cout << "Thank You For Using Program Good By.\n";
+        else
+            cout << "Invalid Choice.\n";
+    } while (choice != 10);
+}
+void addStudent(Students students[], int& totalstudents, int sections[]) {
+    if (totalstudents >= 500) {
+        cout << "Student limit reached Cannot add more students.\n";
+    }
+    else {
+        Students student;
+        cout << "Enter Student Name: ";
+        cin >> student.name;
+        cout << "Enter Student ARID Number: ";
+        cin >> student.arid;
+        for (int i = 0; i < totalstudents; i++) {
+            if (students[i].arid == student.arid) {
+                cout << "ARID number already exists Please enter a unique ARID number.\n";
+            }
+        }
+        cout << "Enter Student Section (From 1 to 10): ";
+        cin >> student.section;
+        if (student.section < 1 || student.section > 10)
+        {
+            cout << "Please select a valid section (From1 to 10).\n";
+        }
+        else
+        {
+            if (sections[student.section - 1] >= 50)
+            {
+                cout << "Section " << student.section << " Already has 50 students Cannot add more students.\n";
+            }
+        }
+        students[totalstudents++] = student;
+        sections[student.section - 1]++;
+        cout << "Student added successfully.\n";
+    }
+}
+void markAttendance(Students students[], int totalstudents) {
+    if (totalstudents == 0) {
+        cout << "No students available to mark attendance.\n";
+    }
+    else {
+        int day, month, year;
+        cout << "Enter today's date (DD MM YYYY): ";
+        cin >> day >> month >> year;
+        if (day < 1 || day > 30 || month < 1 || month > 12 || year <= 0) {
+            cout << "Invalid date Please enter a valid date. ";
+        }
+        else {
+            int flag = 0;
+            for (int x = 0; x < totalstudents; x++) {
+                if (students[x].day == day && students[x].month == month && students[x].year == year) {
+                    flag = 1;
+                    break;
+                }
+            }
+            if (flag == 1) {
+                cout << "Attendance for " << day << "/" << month << "/" << year << " has already been marked Please enter a different date.\n";
+            }
+            else {
+                cout << "Mark attendance for students:\n";
+                for (int x = 0; x < totalstudents; x++) {
+                    cout << "ARID NO: " << students[x].arid << " | "
+                        << "Student Name: " << students[x].name << " | "
+                        << "Student Section: " << students[x].section << " (P / A): ";
+                    cin >> students[x].attendance;
+                    if (students[x].attendance == 'P' || students[x].attendance == 'p') {
+                        students[x].presentCount++;
+                    }
+                    else if (students[x].attendance == 'A' || students[x].attendance == 'a') {
+                        students[x].absentCount++;
+                    }
+                    students[x].day = day;
+                    students[x].month = month;
+                    students[x].year = year;
+                }
+                cout << "Attendance marked successfully.\n";
+            }
+        }
+    }
+}
+void viewAttendance(Students students[], int totalstudents) {
+    if (totalstudents == 0) {
+        cout << "No students available to view attendance.\n";
+    }
+    else {
+        int f = 0;
+        for (int i = 0; i < totalstudents; i++) {
+            if (students[i].day != 0 || students[i].month != 0 || students[i].year != 0) {
+                f = 1; 
+                break;
+            }
+        }
+        if (f == 0) {
+            cout << "There is no attendance to view.\n";
+        }
+        else {
+            char choice;
+            cout << "View all students attendance or only one student attendance (press A/a for all, press O/o for one): ";
+            cin >> choice;
+            if (choice == 'A' || choice == 'a') {
+                for (int i = 0; i < totalstudents; i++) {
+                    cout << "ARID: " << students[i].arid
+                        << " | Name: " << students[i].name
+                        << " | Section: " << students[i].section
+                        << " | Present: " << students[i].presentCount
+                        << " | Absent: " << students[i].absentCount
+                        << " | Last Attendance: " << students[i].day << "/" << students[i].month << "/" << students[i].year << "\n";
+                }
+            }
+            else if (choice == 'O' || choice == 'o') {
+                int arid;
+                cout << "Enter student ARID number: ";
+                cin >> arid;
+
+                int found = 0;
+                for (int i = 0; i < totalstudents; i++) {
+                    if (students[i].arid == arid) {
+                        found = 1;
+                        cout << "ARID: " << students[i].arid
+                            << " | Name: " << students[i].name
+                            << " | Section: " << students[i].section
+                            << " | Present: " << students[i].presentCount
+                            << " | Absent: " << students[i].absentCount
+                            << " | Last Attendance: " << students[i].day << "/" << students[i].month << "/" << students[i].year << "\n";
+                        break;
+                    }
+                }
+
+                if (found == 0) {
+                    cout << "Student not found.\n";
+                }
+            }
+            else {
+                cout << "Invalid choice.\n";
+            }
+        }
+    }
+}
+void removeStudent(Students students[], int& totalstudents, int sections[]) {
+    if (totalstudents == 0) {
+        cout << "No students available to remove.\n";
+    }
+    else {
+        int arid;
+        cout << "Enter ARID of student to remove: ";
+        cin >> arid;
+        int f = 0;
+        for (int i = 0; i < totalstudents; i++) {
+            if (students[i].arid == arid) {
+                f = 1;
+                sections[students[i].section - 1]--;
+                for (int j = i; j < totalstudents - 1; j++) {
+                    students[j] = students[j + 1];
+                }
+                totalstudents--;
+                cout << "Student removed successfully.\n";
+            }
+        }
+        if(f==0)
+        cout << "Student not found.\n";
+    }
+}
+void updateStudentDetails(Students students[], int totalstudents) {
+    if (totalstudents == 0) {
+        cout << "No students available to update.\n";
+    }
+    else {
+        int arid;
+        cout << "Enter ARID of student to update: ";
+        cin >> arid;
+        int f = 0;
+        for (int i = 0; i < totalstudents; i++) {
+            if (students[i].arid == arid) {
+                f = 1;
+                cout << "Enter new name for "<< students[i].name << " : ";
+                cin >> students[i].name;
+                int newarid;
+                cout << "Enter new ARID Number for "<<students[i].arid<<" : ";
+                cin >> newarid;
+                students[i].arid = newarid;
+                cout << "Student details updated successfully.\n";
+            }
+        }
+        if(f==0)
+        cout << "Student not found.\n";
+    }
+}
+void updateAttendance(Students students[], int totalstudents) {
+    if (totalstudents == 0) {
+        cout << "No students available to update attendance.\n";
+    }
+    else {
+        int arid;
+        cout << "Enter ARID of student to update attendance: ";
+        cin >> arid;
+        int f = 0;
+        for (int i = 0; i < totalstudents; i++) {
+            if (students[i].arid == arid) {
+                f = 1;
+                char newAttendance;
+                cout << "Enter new attendance for "<<students[i].name << " (P / A) : ";
+                cin >> newAttendance;
+                if (students[i].attendance == 'P' || students[i].attendance == 'p') {
+                    students[i].presentCount--;
+                }
+                else if (students[i].attendance == 'A' || students[i].attendance == 'a') {
+                    students[i].absentCount--;
+                }
+                students[i].attendance = newAttendance;
+                if (newAttendance == 'P' || newAttendance == 'p') {
+                    students[i].presentCount++;
+                }
+                else if (newAttendance == 'A' || newAttendance == 'a') {
+                    students[i].absentCount++;
+                }
+                cout << "Attendance updated successfully.\n";
+            }
+        }
+        if (f == 0)
+        {
+            cout << "Student not found.\n";
+        }
+    }
+}
+void viewStudents(Students students[], int totalstudents) {
+    if (totalstudents == 0) {
+        cout << "No students available to view.\n";
+    }
+    else {
+        char choice;
+        cout << "View all students or only one student (press A/a for all press O/o for one).";
+        cin >> choice;
+        if (choice == 'A' || choice == 'a') {
+            for (int i = 0; i < totalstudents; i++)
+            {
+                cout << "ARID: " << students[i].arid << " | Name: " << students[i].name << " | Section: " << students[i].section << "\n";
+            }
+        }
+        if (choice == 'O' || choice == 'o')
+        {
+            int arid;
+            cout << "Enter student ARID number: ";
+            cin >> arid;
+            int f = 0;
+            for (int i = 0;i < totalstudents;i++)
+            {
+                if (students[i].arid == arid)
+                {
+                    f = 1;
+                    cout << "ARID: " << students[i].arid << " | Name: " << students[i].name << " | Section: " << students[i].section << "\n";
+                }
+                if (f == 0)
+                {
+                    cout << "Student not found.";
+                }
+            }
+        }
+    }
+}
+    void updateSections(Students students[], int totalstudents, int sections[]) {
+        if (totalstudents == 0) {
+            cout << "No students available to update section.\n";
+        }
+        else {
+            int arid, newSection;
+            cout << "Enter ARID of student to update section: ";
+            cin >> arid;
+            int f = 0;
+            for (int i = 0; i < totalstudents; i++) {
+                if (students[i].arid == arid) {
+                    f = 1;
+                    cout << "Enter new section for "<<students[i].name<<" (From 1 to 10): ";
+                    cin >> newSection;
+                    if (newSection < 1 || newSection > 10)
+                    {
+                        cout << "Please select a valid section (From1 to 10).\n";
+                    }
+                    else
+                    {
+                        if (sections[newSection - 1] >= 50) 
+                        {
+                            cout << "Section " <<newSection << " Already has 50 students Cannot add more students.\n";
+                        }
+                    }
+                    sections[students[i].section - 1]--;
+                    students[i].section = newSection;
+                    sections[newSection - 1]++;
+                    cout << "Section updated successfully.\n";
+                }
+            }
+            if(f==0)
+            cout << "Student not found.\n";
+        }
+    }
+void updateDate(Students students[], int totalstudents) {
+    if (totalstudents == 0) {
+        cout << "No students available to update date.\n";
+    }
+    else {
+        int newDate, newMonth, newYear;
+        cout << "Enter new date (DD MM YYYY): ";
+        cin >> newDate >> newMonth >> newYear;
+        if (newDate < 1 || newDate > 31 || newMonth < 1 || newMonth > 12 || newYear <= 0) {
+            cout << "Invalid date please enter a valid date.\n";
+        }
+        else
+        {
+            for (int i = 0;i < totalstudents;i++) {
+                students[i].day = newDate;
+                students[i].month = newMonth;
+                students[i].year = newYear;
+            }
+            cout << "Date and year updated successfully.\n";
+        }
+    }
+}
